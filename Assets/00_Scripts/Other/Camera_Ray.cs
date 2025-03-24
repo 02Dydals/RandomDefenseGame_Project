@@ -9,10 +9,13 @@ public class Camera_Ray : NetworkBehaviour
 {
     Camera cam;
     Hero_Holder holder = null ;
-    Hero_Holder Move_Holder = null;    
+    Hero_Holder Move_Holder = null;
+    string HostAndClient = "";
+
     private void Start()
     {
-        cam  = Camera.main;        
+        cam  = Camera.main;
+        HostAndClient = Net_Utils.LocalID() == 0 ? "HOST" : "CLIENT";
     }
 
     private void Update()
@@ -46,6 +49,11 @@ public class Camera_Ray : NetworkBehaviour
         if (hit.collider != null)
         {
             holder = hit.collider.GetComponent<Hero_Holder>();
+            if (holder.Holder_Name == "" || holder.Holder_Name == null)
+            {
+                holder = null;
+                return;
+            }
 
             bool CanGet = false;
             int value = (int)NetworkManager.Singleton.LocalClientId;
@@ -97,6 +105,8 @@ public class Camera_Ray : NetworkBehaviour
 
             if(hit.collider != null && hit.collider.transform != holder.transform)
             {
+                if (hit.collider.GetComponent<Hero_Holder>() == null) return;
+                if (hit.collider.GetComponent<Hero_Holder>().Holder_Part_Name.Contains(HostAndClient) == false) return;
                 if(Move_Holder != null)
                 {
                     Move_Holder.S_SetClick(false);

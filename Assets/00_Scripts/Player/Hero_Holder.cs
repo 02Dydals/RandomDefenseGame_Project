@@ -16,7 +16,7 @@ public class Hero_Holder : NetworkBehaviour
     public string Holder_Part_Name;
     public List<Hero> m_Heroes = new List<Hero>();
     public int index;
-    HeroData m_Data;
+    public HeroData m_Data;
 
     public Button SellButton, CompositionButton;
 
@@ -158,7 +158,7 @@ public class Hero_Holder : NetworkBehaviour
         }
         for (int i = 0; i < holderTemp.Length; i++) Spawner.instance.Hero_Holders[holderTemp[i]].Sell(false);
 
-        Spawner.instance.Summon("UnCommon", true);
+        Spawner.instance.Summon("UnCommon");
     }
     #endregion ¿µ¿õ Á¶ÇÕ
 

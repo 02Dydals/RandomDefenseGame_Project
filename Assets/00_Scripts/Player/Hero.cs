@@ -20,8 +20,11 @@ public class Hero : Character
     public string HeroName;
     public Rarity HeroRarity;
 
+    [SerializeField] private GameObject spawnParticle;
+
     public void Initialize(HeroData obj, Hero_Holder holder, string rarity)
-    {        
+    {
+        m_Data = Resources.Load<Hero_Scriptable>("Character_Scriptable/" + rarity + "/" + obj.heroName);
         parent_holder = holder;
         ATK = obj.heroATK;
         attackSpeed = obj.heroATK_Speed;
@@ -30,6 +33,7 @@ public class Hero : Character
         HeroName = obj.heroName;
         HeroRarity = (Rarity)Enum.Parse(typeof(Rarity), rarity);
         GetInitCharacter(obj.heroName, rarity);
+        Instantiate(spawnParticle, parent_holder.transform.position , Quaternion.identity);
     }
 
 
@@ -90,7 +94,8 @@ public class Hero : Character
             {
                 attackSpeed = 0.0f;
                 AnimatorChanage("ATTACK", true);
-                AttackMonsterServerRpc(target.NetworkObjectId);
+                GetBullet();
+                //AttackMonsterServerRpc(target.NetworkObjectId);
             }
             
         }
@@ -100,15 +105,27 @@ public class Hero : Character
         }
     }
 
+    public void GetBullet()
+    {
+        var go = Instantiate(m_Data.HitParticle, (transform.position + new Vector3(0, 0.1f, 0) ), Quaternion.identity);
+        go.Init(target.transform, this);
+    }
+
+    public void SetDamage()
+    {
+        if (target != null)
+            AttackMonsterServerRpc(target.NetworkObjectId);
+    }
+
     [ServerRpc(RequireOwnership = false)]
-    private void AttackMonsterServerRpc(ulong monsterId)
+    public void AttackMonsterServerRpc(ulong monsterId)
     {
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(monsterId, out var spawnedObject))
         { 
             Monster monster = spawnedObject.GetComponent<Monster>();
             if(monster != null)
             {
-                monster.GetDamage(ATK);
+                monster.GetDamage(ATK);//
             }
         }
     }

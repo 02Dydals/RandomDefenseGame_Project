@@ -40,6 +40,7 @@ public class Spawner : NetworkBehaviour
 
     public static float xValue, yValue;
 
+    Hero_Scriptable data;
 
     private void Start()
     {
@@ -79,7 +80,8 @@ public class Spawner : NetworkBehaviour
         string Holder02Name = holder02.Holder_Name;
 
         (holder01.Holder_Name, holder02.Holder_Name) = (holder02.Holder_Name, holder01.Holder_Name);
-        (holder01.m_Heroes, holder02.m_Heroes) = (new List<Hero>(holder02.m_Heroes), new List<Hero>(holder01.m_Heroes));       
+        (holder01.m_Heroes, holder02.m_Heroes) = (new List<Hero>(holder02.m_Heroes), new List<Hero>(holder01.m_Heroes));
+        (holder01.m_Data, holder02.m_Data) = (holder02.m_Data, holder01.m_Data);
     }
     #endregion 히어로 위치 변경
 
@@ -162,39 +164,39 @@ public class Spawner : NetworkBehaviour
     #endregion
 
     #region 캐릭터 소환
-    public void Summon(string rarity, bool NoneLimit = false)
+    public void Summon(string rarity, Hero_Scriptable scriptData = null)
     {
-        if(NoneLimit == false)
-        {
-            if (Game_Mng.instance.Money < Game_Mng.instance.SummonCount) return;
-            if (Game_Mng.instance.HeroCount >= Game_Mng.instance.HeroMaximumCount) return;
+        data = scriptData;
+        if (scriptData == null)
+            data = Data(rarity);
 
-            Game_Mng.instance.Money -= Game_Mng.instance.SummonCount;
-            Game_Mng.instance.SummonCount += 2;
-            Game_Mng.instance.HeroCount++;
-        }
-        
         Net_Utils.HostAndClientMethod(
-            () => ServerSpawnHeroServerRpc(Net_Utils.LocalID(), rarity),
-            () => HeroSpawn(Net_Utils.LocalID(), rarity));       
+            () => ServerSpawnHeroServerRpc(Net_Utils.LocalID(), rarity, data.name),
+            () => HeroSpawn(Net_Utils.LocalID(), rarity, data.name));       
         
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void ServerSpawnHeroServerRpc(ulong clientId, string rarity)
+    private void ServerSpawnHeroServerRpc(ulong clientId, string rarity, string dataName)
     {
-        HeroSpawn(clientId , rarity);
+        HeroSpawn(clientId , rarity, data.name);
     }
 
-    private void HeroSpawn(ulong clientId, string rarity)
-    {                
+    public Hero_Scriptable Data(string rarity)
+    {
         // 히어로 데이터를 받아온다
-        Hero_Scriptable[] m_Character_Datas = Resources.LoadAll<Hero_Scriptable>("Character_Scriptable/"+rarity);
+        Hero_Scriptable[] m_Character_Datas = Resources.LoadAll<Hero_Scriptable>("Character_Scriptable/" + rarity);
         var data = m_Character_Datas[UnityEngine.Random.Range(0, m_Character_Datas.Length)];
 
+        return data;
+    }
+
+    private void HeroSpawn(ulong clientId, string rarity, string dataName)
+    {
+        data = Resources.Load<Hero_Scriptable>("Character_Scriptable/" + rarity + "/" + dataName);
         string temp = clientId == 0 ? "HOST" : "CLIENT";        
         int value = clientId == 0 ? 0 : 1;
-        string Organizers = temp + Host_Client_Value_Index[value].ToString();
+        string Organizers = temp + Host_Client_Value_Index[value].ToString();        
 
         var existingHolder = GetExistingHolder(temp, data.Name);
 
@@ -209,6 +211,22 @@ public class Spawner : NetworkBehaviour
          var networkObject = Hero_Holders[Organizers].GetComponent<NetworkObject>();
 
          ClientSpawnHeroClientRpc(networkObject.NetworkObjectId, data.GetHeroData(), value, rarity);     
+    }
+
+    public Vector3 HolderPosition(Hero_Scriptable data)
+    {
+        string temp = Net_Utils.LocalID() == 0 ? "HOST" : "CLIENT";
+        int value = Net_Utils.LocalID() == 0 ? 0 : 1;
+        string Organizers = temp + Host_Client_Value_Index[value].ToString();
+
+        var existingHolder = GetExistingHolder(temp, data.Name);
+
+        if (existingHolder != null)
+        {
+            return existingHolder.transform.position;
+        }
+
+        return Hero_Holders[Organizers].transform.position;        
     }
 
     private Hero_Holder GetExistingHolder(string clientKey, string heroName)

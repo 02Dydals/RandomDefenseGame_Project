@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine.UI;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Collections;
 
 
 public class UI_Main : MonoBehaviour
@@ -12,28 +13,99 @@ public class UI_Main : MonoBehaviour
     {
         if (instance == null) instance = this;
     }
-    
+
+    [Header("##Text##")]
     [SerializeField] private TextMeshProUGUI MonsterCount_T;
     [SerializeField] private TextMeshProUGUI Money_T;
     [SerializeField] private TextMeshProUGUI Summon_T;
     [SerializeField] private TextMeshProUGUI Timer_T;
-    [SerializeField] private TextMeshProUGUI Wave_T;
-    [SerializeField] private Image MonsterCount_Image;
+    [SerializeField] private TextMeshProUGUI Wave_T;    
     [SerializeField] private TextMeshProUGUI HeroCount_T;
     [SerializeField] private TextMeshProUGUI Navigation_T;
-    [SerializeField] private Transform Navigation_Content;
 
+    [SerializeField] private Image MonsterCount_Image;
+    [SerializeField] private Transform Navigation_Content;
+    [SerializeField] private Button SummonButton;
     [SerializeField] private Animator MoneyAnimation;
+        
+    [Header("##Trail Effect##")] 
+    [SerializeField] private GameObject TrailPrefab;
+    [SerializeField] private float trailSpeed = 5.0f;
+    [UnityEngine.Range(0.0f, 30.0f)]
+    [SerializeField] private float yPosMin, yPosMax;
+    [SerializeField] private float xPos;
 
     List<GameObject> NavigationTextList = new List<GameObject>();
-
-    [SerializeField] private Button SummonButton;
     private void Start()
     {
         Game_Mng.instance.OnMoneyUp += Money_Anim;
         Game_Mng.instance.OnTimerUp += WavePoint;
-        SummonButton.onClick.AddListener(() => Spawner.instance.Summon("Common", false));
+        SummonButton.onClick.AddListener(() => ClickSummon());
     }
+    private void ClickSummon()
+    {
+        if (Game_Mng.instance.Money < Game_Mng.instance.SummonCount) return;
+        if (Game_Mng.instance.HeroCount >= Game_Mng.instance.HeroMaximumCount) return;
+
+        Game_Mng.instance.Money -= Game_Mng.instance.SummonCount;
+        Game_Mng.instance.SummonCount += 2;
+        Game_Mng.instance.HeroCount++; 
+
+        StartCoroutine(SummonCoroutin());
+    }
+
+    private Vector3 GenerateRandomControlPoint(Vector3 start, Vector3 end)
+    {        
+        Vector3 midPoint = (start + end) / 2f;
+
+        float randomHeight = Random.Range(yPosMin, yPosMax);
+
+        midPoint += randomHeight * Vector3.up;
+
+        midPoint += new Vector3(Random.Range(-xPos, xPos), 0.0f);
+
+        return midPoint;
+    }
+
+    private Vector3 CalculateBezierPoint(float t, Vector3 p0, Vector3 p1, Vector3 p2)
+    {
+        // 베지어 곡선 공식 (1-t)^2 * p0 +2 * (1-t) * t * p1 + t^2 * p2
+        return Mathf.Pow(1 - t, 2) * p0 +2 * (1-t) * t * p1 + Mathf.Pow(t, 2) * p2;
+    }
+
+    IEnumerator SummonCoroutin()
+    {
+        var data = Spawner.instance.Data("Common");
+
+        Vector3 buttonWorldPosition = Camera.main.ScreenToWorldPoint(SummonButton.transform.position);
+        GameObject trailInstance = Instantiate(TrailPrefab);
+        trailInstance.transform.position = buttonWorldPosition;
+        Vector3 endPos = Spawner.instance.HolderPosition(data);
+
+        Vector3 startPoint = buttonWorldPosition;
+        Vector3 endPoint = endPos;
+
+        Vector3 controlPoint = GenerateRandomControlPoint(startPoint, endPoint);
+
+        float elapsedTime = 0.0f;
+
+        while(elapsedTime < trailSpeed)
+        {
+            float t = elapsedTime / trailSpeed;
+
+            Vector3 currvePosition = CalculateBezierPoint(t, startPoint, controlPoint, endPoint);
+
+            trailInstance.transform.position = new Vector3(currvePosition.x , currvePosition.y, 0.0f);
+
+            elapsedTime += Time.deltaTime;
+
+            yield return null;
+        }
+
+        Destroy(trailInstance);
+        Spawner.instance.Summon("Common", data);
+    }
+
 
     private void Update()
     {
