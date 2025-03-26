@@ -7,13 +7,14 @@ using Unity.Netcode;
 
 public class Monster : Character
 {
+    public bool Boss;
+
     [SerializeField] private float m_Speed = 1f;
     [SerializeField] private HitText hitText;
     [SerializeField] private Image m_Fill, m_Fill_Deco;
 
     int target_Value = 0;
-    public double HP = 0;
-    public int MaxHP = 30;
+    public double HP = 0, MaxHP = 30;
     
     private bool isDead = false;
 
@@ -23,6 +24,7 @@ public class Monster : Character
     public override void Awake()
     {
         HP = CalculateMonsterHP(Game_Mng.instance.Wave);
+        MaxHP = HP;
         base.Awake();
     }
 
@@ -38,7 +40,7 @@ public class Monster : Character
             powerMultiplier += 0.05f * (waveLevel / 10);
         }
 
-        return baseHP * powerMultiplier;
+        return baseHP * powerMultiplier * (Boss? 10 : 1);
     }
 
     public void Init(List<Vector2> vectorList)
@@ -122,7 +124,7 @@ public class Monster : Character
 
         if(IsServer)
         {
-            Game_Mng.instance.RemoveMonster(this);
+            Game_Mng.instance.RemoveMonster(this, Boss);
             this.gameObject.SetActive(false);
             Destroy(this);         
         }
@@ -131,6 +133,4 @@ public class Monster : Character
             this.gameObject.SetActive(false);
         }
     }
-
-
 }

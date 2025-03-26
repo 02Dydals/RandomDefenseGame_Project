@@ -40,10 +40,12 @@ public class UI_Main : MonoBehaviour
     [SerializeField] private TextMeshProUGUI[] u_Upgrade_T;
     [SerializeField] private TextMeshProUGUI[] u_Upgrade_Asset_T;
 
-    [Header("##Ohters##")]
+    [Header("##Boss##")]
     [SerializeField] private GameObject WavePopUp_Obejct;
+    [SerializeField] private GameObject BossWaveCount;
     [SerializeField] private TextMeshProUGUI WaveText_Object;
-
+    [SerializeField] private TextMeshProUGUI WaveBossName;
+    [SerializeField] private TextMeshProUGUI BossTimer_T;    
 
     List<GameObject> NavigationTextList = new List<GameObject>();
     private void Start()
@@ -53,10 +55,18 @@ public class UI_Main : MonoBehaviour
         SummonButton.onClick.AddListener(() => ClickSummon());
     }
 
-    public void GetWavePopUp()
+    public void GetWavePopUp(bool GetBoss)
     {
         WavePopUp_Obejct.SetActive(true);
         WaveText_Object.text = string.Format("WAVE {0}", Game_Mng.instance.Wave);
+
+        if(GetBoss)
+        {            
+            Animator animator = WavePopUp_Obejct.GetComponent<Animator>();
+            animator.SetTrigger("Boss");
+            WaveBossName.text = Game_Mng.instance.B_Data.bossData[(int)((Game_Mng.instance.Wave) / 10) -1].BossName;
+        }
+        BossWaveCount.SetActive(GetBoss);
     }
 
     public void UpgradeButton(int value)
@@ -171,8 +181,9 @@ public class UI_Main : MonoBehaviour
 
     public void WavePoint()
     {
-        Timer_T.text = UpdateTimerText();
+        Timer_T.text = Game_Mng.instance.GetBoss == false? UpdateTimerText() : "In Boss";
         Wave_T.text = "WAVE : " +Game_Mng.instance.Wave.ToString();
+        BossTimer_T.text= UpdateTimerText();
     }
 
     string UpdateTimerText()

@@ -2,6 +2,7 @@ using NUnit.Framework;
 using UnityEngine;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.VisualScripting;
 
 // 이벤트를 하기 위해 델리게이트 사용
 public delegate void OnMoneyUpEventHandler();
@@ -18,22 +19,25 @@ public class Game_Mng : NetworkBehaviour
         {
             instance = this;
         }
+        B_Data = Resources.Load<Boss_Scriptable>("Boss/Boss_Scriptable");
     }
     
-    public float Timer = 60.0f;
+    public float Timer = 15.0f;
     public int Wave = 1;
     public int Money = 50;
     public int SummonCount = 20;
     public int HeroCount = 0;
     public int HeroMaximumCount = 25;
     public int[] Upgrade = new int[4];
+    public bool GetBoss = false;
 
     public event OnMoneyUpEventHandler OnMoneyUp;
     public event OnTimerUpEventHandler OnTimerUp;
 
     public List<Monster> monsters = new List<Monster>();
+    public List<Monster> Boss_Monster = new List<Monster>();
     public int MonsterCount;
-
+    public Boss_Scriptable B_Data;
     private void Update()
     {
         if(IsServer)
@@ -46,9 +50,14 @@ public class Game_Mng : NetworkBehaviour
             }
             else
             {
+                if(GetBoss)
+                {
+                    Debug.Log("게임 실패");
+                    return; 
+                }
                 Wave++;
                 GetWaveUp = true;
-                Timer = 60;
+                Timer = 15.0f;
             }
             NotifyTimerClientRpc(Timer, Wave, GetWaveUp);            
         }
@@ -63,16 +72,36 @@ public class Game_Mng : NetworkBehaviour
         OnMoneyUp?.Invoke();
     }
 
-    public void AddMonster(Monster monster)
+    public void AddMonster(Monster monster, bool Boss = false)
     {
-        monsters.Add(monster);
+        if(Boss)
+        {
+            Boss_Monster.Add(monster);
+        }
+        else
+        {
+            monsters.Add(monster);
+        }
+        
         MonsterCount++;
         UpdateMonsterCountOnClients();
     }
 
-    public void RemoveMonster(Monster monster)
+    public void RemoveMonster(Monster monster, bool Boss = false)
     {
-        monsters.Remove(monster);
+        if (Boss)
+        {
+            Boss_Monster.Remove(monster);
+            if(Boss_Monster.Count == 0)
+            {
+                GetBoss = false;
+                Timer = 0.0f;
+            }
+        }
+        else
+        {
+            monsters.Remove(monster);
+        }        
         MonsterCount--;
         UpdateMonsterCountOnClients();
     }
@@ -95,7 +124,16 @@ public class Game_Mng : NetworkBehaviour
         Wave = wave;
         if(GetWaveUp)
         {
-            UI_Main.instance.GetWavePopUp();
+            GetBoss = false;      
+            if(Wave % 10 == 0)
+            {
+                GetBoss = true;
+                Spawner.instance.BossSpawn();
+            }
+            else
+                Spawner.instance.ReMonsterSpawn();
+
+            UI_Main.instance.GetWavePopUp(GetBoss);
         }
         OnTimerUp?.Invoke();
     }
