@@ -9,7 +9,21 @@ using System;
 public class Hero : Character
 {
     Hero_Holder parent_holder;
-    public int ATK;
+
+    private double baseATK;
+    public double ATK
+    {
+        get 
+        {
+            float upgradeBonus = Game_Mng.instance.Upgrade[UpgradeCount()] != 0 ?
+                Game_Mng.instance.Upgrade[UpgradeCount()] * 0.1f : 0;
+            return baseATK * (1 + upgradeBonus);
+        }
+        set
+        {
+            
+        }
+    }
     public float attackRange = 1.0f;
     public float attackSpeed = 1.0f;
     public NetworkObject target;
@@ -22,11 +36,27 @@ public class Hero : Character
 
     [SerializeField] private GameObject spawnParticle;
 
+    private int UpgradeCount()
+    {
+        switch(m_Data.rare)
+        {
+            case Rarity.Common:
+            case Rarity.UnCommon:
+            case Rarity.Rare:
+                return 0;
+            case Rarity.Hero:
+                return 1;
+            case Rarity.Legendary:
+                return 2;
+        }
+        return -1;
+    }
+
     public void Initialize(HeroData obj, Hero_Holder holder, string rarity)
     {
         m_Data = Resources.Load<Hero_Scriptable>("Character_Scriptable/" + rarity + "/" + obj.heroName);
         parent_holder = holder;
-        ATK = obj.heroATK;
+        baseATK = obj.heroATK;
         attackSpeed = obj.heroATK_Speed;
         attackRange = obj.heroRange;
 

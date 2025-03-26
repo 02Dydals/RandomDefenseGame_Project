@@ -35,6 +35,12 @@ public class UI_Main : MonoBehaviour
     [SerializeField] private float yPosMin, yPosMax;
     [SerializeField] private float xPos;
 
+    [Header("##Upgrade##")]
+    [SerializeField] private TextMeshProUGUI u_Money_T;
+    [SerializeField] private TextMeshProUGUI[] u_Upgrade_T;
+    [SerializeField] private TextMeshProUGUI[] u_Upgrade_Asset_T;
+
+
     List<GameObject> NavigationTextList = new List<GameObject>();
     private void Start()
     {
@@ -42,6 +48,15 @@ public class UI_Main : MonoBehaviour
         Game_Mng.instance.OnTimerUp += WavePoint;
         SummonButton.onClick.AddListener(() => ClickSummon());
     }
+
+    public void UpgradeButton(int value)
+    {
+        if (Game_Mng.instance.Money < 30 + Game_Mng.instance.Upgrade[value])
+            return;
+        Game_Mng.instance.Money -= (30+ Game_Mng.instance.Upgrade[value]);
+        Game_Mng.instance.Upgrade[value]++;
+    }
+
     private void ClickSummon()
     {
         if (Game_Mng.instance.Money < Game_Mng.instance.SummonCount) return;
@@ -115,6 +130,14 @@ public class UI_Main : MonoBehaviour
 
         Money_T.text = Game_Mng.instance.Money.ToString();
         Summon_T.text = Game_Mng.instance.SummonCount.ToString();
+        u_Money_T.text = Game_Mng.instance.Money.ToString();
+
+        for(int i=0; i< u_Upgrade_T.Length; i++)
+        {
+            u_Upgrade_T[i].text = "Lv."+(Game_Mng.instance.Upgrade[i] + 1).ToString();
+            u_Upgrade_Asset_T[i].text = (30 + Game_Mng.instance.Upgrade[i]).ToString();
+        }
+
         Summon_T.color = Game_Mng.instance.Money >= Game_Mng.instance.SummonCount ? Color.white : Color.red;
     }
 

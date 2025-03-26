@@ -26,6 +26,7 @@ public class Game_Mng : NetworkBehaviour
     public int SummonCount = 20;
     public int HeroCount = 0;
     public int HeroMaximumCount = 25;
+    public int[] Upgrade = new int[4];
 
     public event OnMoneyUpEventHandler OnMoneyUp;
     public event OnTimerUpEventHandler OnTimerUp;

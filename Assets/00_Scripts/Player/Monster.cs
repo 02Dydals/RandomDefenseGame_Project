@@ -12,7 +12,7 @@ public class Monster : Character
     [SerializeField] private Image m_Fill, m_Fill_Deco;
 
     int target_Value = 0;
-    public int HP = 0;
+    public double HP = 0;
     public int MaxHP = 30;
     
     private bool isDead = false;
@@ -53,7 +53,7 @@ public class Monster : Character
         }
     }
 
-    public void GetDamage(int dmg)
+    public void GetDamage(double dmg)
     {
         if (!IsServer) return;
         if (isDead) return;
@@ -61,7 +61,7 @@ public class Monster : Character
         GetDamageMonster(dmg);        
         NotifyClientUpdateClientRpc(HP -= dmg, dmg);     
     }
-    private void GetDamageMonster(int dmg)
+    private void GetDamageMonster(double dmg)
     {
         HP -= dmg;
         m_Fill.fillAmount = (float)HP / (float)MaxHP;
@@ -79,7 +79,7 @@ public class Monster : Character
     }
 
     [ClientRpc]
-    public void NotifyClientUpdateClientRpc(int hp, int dmg)
+    public void NotifyClientUpdateClientRpc(double hp, double dmg)
     {
         HP = hp;
         m_Fill.fillAmount = (float)HP / (float)MaxHP;
