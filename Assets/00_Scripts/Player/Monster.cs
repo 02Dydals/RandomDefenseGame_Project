@@ -22,8 +22,23 @@ public class Monster : Character
 
     public override void Awake()
     {
-        HP = MaxHP;
+        HP = CalculateMonsterHP(Game_Mng.instance.Wave);
         base.Awake();
+    }
+
+    // 지수적 증가 공식 : Monster HP
+    double CalculateMonsterHP(int waveLevel)
+    {
+        double baseHP = 50.0f;
+
+        double powerMultiplier = Mathf.Pow(1.1f, waveLevel);
+
+        if(waveLevel % 10 ==0)
+        {
+            powerMultiplier += 0.05f * (waveLevel / 10);
+        }
+
+        return baseHP * powerMultiplier;
     }
 
     public void Init(List<Vector2> vectorList)

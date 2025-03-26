@@ -38,7 +38,7 @@ public class Game_Mng : NetworkBehaviour
     {
         if(IsServer)
         {
-            
+            bool GetWaveUp = false;
             if(Timer > 0)
             {
                 Timer -= Time.deltaTime;
@@ -47,9 +47,10 @@ public class Game_Mng : NetworkBehaviour
             else
             {
                 Wave++;
+                GetWaveUp = true;
                 Timer = 60;
             }
-            NotifyTimerClientRpc(Timer, Wave);
+            NotifyTimerClientRpc(Timer, Wave, GetWaveUp);            
         }
     }
 
@@ -88,10 +89,14 @@ public class Game_Mng : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void NotifyTimerClientRpc(float timer, int wave)
+    private void NotifyTimerClientRpc(float timer, int wave, bool GetWaveUp)
     {
         Timer = timer;
-        wave = Wave;
+        Wave = wave;
+        if(GetWaveUp)
+        {
+            UI_Main.instance.GetWavePopUp();
+        }
         OnTimerUp?.Invoke();
     }
 

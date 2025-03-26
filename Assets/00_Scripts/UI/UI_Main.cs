@@ -40,6 +40,10 @@ public class UI_Main : MonoBehaviour
     [SerializeField] private TextMeshProUGUI[] u_Upgrade_T;
     [SerializeField] private TextMeshProUGUI[] u_Upgrade_Asset_T;
 
+    [Header("##Ohters##")]
+    [SerializeField] private GameObject WavePopUp_Obejct;
+    [SerializeField] private TextMeshProUGUI WaveText_Object;
+
 
     List<GameObject> NavigationTextList = new List<GameObject>();
     private void Start()
@@ -47,6 +51,12 @@ public class UI_Main : MonoBehaviour
         Game_Mng.instance.OnMoneyUp += Money_Anim;
         Game_Mng.instance.OnTimerUp += WavePoint;
         SummonButton.onClick.AddListener(() => ClickSummon());
+    }
+
+    public void GetWavePopUp()
+    {
+        WavePopUp_Obejct.SetActive(true);
+        WaveText_Object.text = string.Format("WAVE {0}", Game_Mng.instance.Wave);
     }
 
     public void UpgradeButton(int value)

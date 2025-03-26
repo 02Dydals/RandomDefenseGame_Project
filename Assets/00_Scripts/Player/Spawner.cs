@@ -226,7 +226,7 @@ public class Spawner : NetworkBehaviour
             return existingHolder.transform.position;
         }
 
-        return Hero_Holders[Organizers].transform.position;        
+        return Hero_Holders[Organizers].transform.position;
     }
 
     private Hero_Holder GetExistingHolder(string clientKey, string heroName)

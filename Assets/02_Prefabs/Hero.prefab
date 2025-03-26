@@ -77,7 +77,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0.16055636, g: 0.3490566, b: 0.103729084, a: 1}
+  m_Color: {r: 0.9339623, g: 0.41791713, b: 0.3304112, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -270,7 +270,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  ATK: 0
   attackRange: 0.5
   attackSpeed: 1
   target: {fileID: 0}
@@ -278,3 +277,13 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   m_Data: {fileID: 0}
+  HeroName: 
+  HeroRarity: 0
+  colors:
+  - {r: 0.49019608, g: 0.49019608, b: 0.49019608, a: 1}
+  - {r: 0.41960785, g: 0.6509804, b: 0.31764707, a: 1}
+  - {r: 0.41960785, g: 0.5647059, b: 0.8980392, a: 1}
+  - {r: 0.7607843, g: 0.8, b: 0.29803923, a: 1}
+  - {r: 0.93333334, g: 0.41960785, b: 0.32941177, a: 1}
+  circleRenderer: {fileID: 6215073487110852028}
+  spawnParticle: {fileID: 9020612199273515713, guid: 86db6058d87fc884dab48fd49b943920, type: 3}

@@ -33,6 +33,8 @@ public class Hero : Character
 
     public string HeroName;
     public Rarity HeroRarity;
+    public Color[] colors;
+    public SpriteRenderer circleRenderer;
 
     [SerializeField] private GameObject spawnParticle;
 
@@ -62,6 +64,7 @@ public class Hero : Character
 
         HeroName = obj.heroName;
         HeroRarity = (Rarity)Enum.Parse(typeof(Rarity), rarity);
+        circleRenderer.color = colors[(int)HeroRarity];
         GetInitCharacter(obj.heroName, rarity);
         Instantiate(spawnParticle, parent_holder.transform.position , Quaternion.identity);
     }

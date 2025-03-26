@@ -70,22 +70,19 @@ public class Hero_Holder : NetworkBehaviour
         ulong heroId = hero.NetworkObjectId;
         NetworkObject obj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[heroId];
         SellClientRpc(heroId, clientID);
-        obj.Despawn();
+        obj.Despawn();        
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void DestroyServerRpc(ulong clientID)
     {
         DestroyClientRpc(clientID);
-        NetworkObject holderObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[NetworkObjectId];
-        holderObj.Despawn();        
+        Holder_Name = "";     
     }
 
     [ClientRpc]
     private void DestroyClientRpc(ulong clientID)
     {
-        Spawner.instance.Hero_Holders.Remove(Holder_Part_Name);
-        
         if (Net_Utils.IsClientCheck(clientID))
         {
             Spawner.Player_spawn_list_Array[index] = false;
@@ -104,7 +101,7 @@ public class Hero_Holder : NetworkBehaviour
         m_Heroes.Remove(obj.GetComponent<Hero>());
         if(m_Heroes.Count == 0)
         {
-            DestroyServerRpc(clientID);
+            DestroyServerRpc(clientID);            
         }
         CheckGetPosition();
     }
@@ -157,7 +154,7 @@ public class Hero_Holder : NetworkBehaviour
             }
         }
         for (int i = 0; i < holderTemp.Length; i++) Spawner.instance.Hero_Holders[holderTemp[i]].Sell(false);
-
+        ReturnRange();
         Spawner.instance.Summon("UnCommon");
     }
     #endregion ¿µ¿õ Á¶ÇÕ

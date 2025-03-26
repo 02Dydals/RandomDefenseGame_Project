@@ -16,4 +16,6 @@ MonoBehaviour:
   ATK: 7
   ATK_Speed: 1
   Range: 0.8
+  rare: 0
   m_animator: {fileID: 9100000, guid: 6006b444d3ecdaf44a9fe3c403dbebc4, type: 2}
+  HitParticle: {fileID: 4544238314839736833, guid: d42cb9e8a23357844bcfb51411f034fb, type: 3}
