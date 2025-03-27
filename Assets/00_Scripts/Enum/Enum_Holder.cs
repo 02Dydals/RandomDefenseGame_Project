@@ -1,4 +1,10 @@
 
+public enum Debuff
+{
+    Slow,
+    Sturn
+}
+
 public enum HostType
 {
     Host,

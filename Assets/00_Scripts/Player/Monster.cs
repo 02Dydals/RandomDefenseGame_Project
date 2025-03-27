@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEditor.ShaderGraph.Internal;
+using System;
 
 
 public class Monster : Character
@@ -16,12 +17,15 @@ public class Monster : Character
     [SerializeField] private Image m_Fill, m_Fill_Deco;
 
     Coroutine slowCoroutine;
+    Coroutine stunCoroutine;
     [SerializeField] private Color slowColor;
     private float currentSlowAmount;
     private float currentSlowDuration;
+    private bool isStun = false;
+    [SerializeField] private GameObject StunParticle;
 
     int target_Value = 0;
-    public double HP = 0, MaxHP = 30;
+    public double HP = 0, MaxHP = 100;
     
     private bool isDead = false;
 
@@ -39,7 +43,7 @@ public class Monster : Character
     // 지수적 증가 공식 : Monster HP
     double CalculateMonsterHP(int waveLevel)
     {
-        double baseHP = 50.0f;
+        double baseHP = 100.0f;
 
         double powerMultiplier = Mathf.Pow(1.1f, waveLevel);
 
@@ -60,6 +64,7 @@ public class Monster : Character
     {
         m_Fill_Deco.fillAmount = Mathf.Lerp(m_Fill_Deco.fillAmount, m_Fill.fillAmount, Time.deltaTime * 2f);
         if (isDead) return;
+        if (isStun) return;
 
         transform.position = Vector2.MoveTowards(transform.position,
                                                  move_list[target_Value],
@@ -142,48 +147,92 @@ public class Monster : Character
         }
     }
 
-    #region 슬로우
+    #region 상태 이상
     /*슬로우 프로퍼티
      * float slowChance; 캐릭터가 몬스터에게 슬로우를 줄 확률
      * float slowAmount; 몬스터의 속도를 감소시키는 확률
-     * float slowDuration; 슬로우 효과가 유지는 시간
+     * float slowDuration; 슬로우 효과가 유지되는 시간
      * float m_Speed; 몬스터의 속도     
+     * 
+     * 스턴 프로퍼티
+     * sturnDuration : 스턴 효과가 유지되는 시간
      */
-
-    [ServerRpc(RequireOwnership = false)]
-    public void ApplySlowServerRpc(float slowAmount, float duration)
+    [ClientRpc]
+    private void ApplySturnClientRpc(float sturnDuration)
     {
-        if (slowAmount > currentSlowAmount || (slowAmount == currentSlowAmount && duration > currentSlowDuration))
-        {
-            currentSlowAmount = slowAmount;
-            currentSlowDuration = duration;
-
-            ApplySlowClientRpc(slowAmount, duration);
-        }
+        CoroutineStop(stunCoroutine);
+        stunCoroutine = StartCoroutine(EffectCoroutine(sturnDuration,
+            () =>
+            {
+                isStun = true;
+                StunParticle.SetActive(true);
+            },
+            () =>
+            {                
+                isStun = false;
+                StunParticle.SetActive(false);
+            }
+            ));
     }
+
 
     [ClientRpc]
     private void ApplySlowClientRpc(float slowAmount, float duration)
     {
-        if (slowCoroutine != null)
+        CoroutineStop(slowCoroutine);
+        slowCoroutine = StartCoroutine(EffectCoroutine(duration,
+        () =>
         {
-            StopCoroutine(slowCoroutine);
+            float newSpeed = originalSpeed - (originalSpeed * slowAmount);
+            newSpeed = Mathf.Max(newSpeed, 0.1f);
+            m_Speed = newSpeed;
+            renderer.color = slowColor;
+        },
+        () =>
+        {
+            m_Speed = originalSpeed;
+            renderer.color = Color.white;
         }
-        slowCoroutine = StartCoroutine(SlowEffectCoroutine(slowAmount, duration));
+        ));
     }
 
-    private IEnumerator SlowEffectCoroutine(float slowAmount, float duration)
+    private void CoroutineStop(Coroutine coroutine)
     {
-        float newSpeed = originalSpeed - (originalSpeed * slowAmount);
-        newSpeed = Mathf.Max(newSpeed, 0.1f);
-        m_Speed = newSpeed;
-        renderer.color = slowColor;
-        yield return new WaitForSeconds(duration);
-        m_Speed = originalSpeed;
-        renderer.color = Color.white;
+        if(coroutine != null)
+        {
+            StopCoroutine(coroutine);
+        }
     }
 
+    private IEnumerator EffectCoroutine(float duration, Action FirstAction, Action SecondAction)
+    {
+        FirstAction?.Invoke();
 
+        yield return new WaitForSeconds(duration);
 
-    #endregion 슬로우
+        SecondAction?.Invoke();
+    }
+    
+
+    [ServerRpc(RequireOwnership = false)]
+    public void ApplyDebuffServerRpc(int debuffType, float[] values)
+    {
+        Debuff debuff = (Debuff)debuffType;
+        switch(debuff)
+        {
+            case Debuff.Slow:
+                if (values[0] > currentSlowAmount || (values[0] == currentSlowAmount && values[1] > currentSlowDuration))
+                {
+                    currentSlowAmount = values[0];
+                    currentSlowDuration = values[1];
+
+                    ApplySlowClientRpc(values[0], values[1]);
+                }                
+                break;
+            case Debuff.Sturn:
+                ApplySturnClientRpc(values[0]);
+                break;
+        }
+    }
+    #endregion 상태이상
 }

@@ -38,9 +38,12 @@ public class Hero : Character
 
     [SerializeField] private GameObject spawnParticle;
 
+    [Header("##Status##")]
     public float slowChance = 0.5f;
     public float slowAmount = 0.3f;
     public float slowDuration = 2.0f;
+    public float stunChance = 0.5f;
+    public float stunDuration = 3.0f;
 
     private int UpgradeCount()
     {
@@ -155,7 +158,13 @@ public class Hero : Character
             AttackMonsterServerRpc(target.NetworkObjectId);
             if(UnityEngine.Random.value <= slowChance)
             {
-                target.GetComponent<Monster>().ApplySlowServerRpc(slowAmount, slowDuration);
+                float[] valuse = { slowAmount, slowDuration };
+                target.GetComponent<Monster>().ApplyDebuffServerRpc((int)Debuff.Slow, valuse);
+            }
+            if(UnityEngine.Random.value <= stunChance)
+            {
+                float[] value = { stunDuration };
+                target.GetComponent<Monster>().ApplyDebuffServerRpc((int)Debuff.Sturn, value);
             }
         }            
     }
