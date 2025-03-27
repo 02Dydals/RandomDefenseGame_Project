@@ -2,9 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Rendering;
 using System;
-
 
 public class Hero : Character
 {
@@ -38,12 +36,11 @@ public class Hero : Character
 
     [SerializeField] private GameObject spawnParticle;
 
-    [Header("##Status##")]
-    public float slowChance = 0.5f;
-    public float slowAmount = 0.3f;
-    public float slowDuration = 2.0f;
-    public float stunChance = 0.5f;
-    public float stunDuration = 3.0f;
+    //public float slowChance = 0.5f;
+    //public float slowAmount = 0.3f;
+    //public float slowDuration = 2.0f;
+    //public float stunChance = 0.5f;
+    //public float stunDuration = 3.0f;
 
     private int UpgradeCount()
     {
@@ -156,16 +153,33 @@ public class Hero : Character
         if (target != null)
         {
             AttackMonsterServerRpc(target.NetworkObjectId);
-            if(UnityEngine.Random.value <= slowChance)
+            if (m_Data.effectType != null)
             {
-                float[] valuse = { slowAmount, slowDuration };
-                target.GetComponent<Monster>().ApplyDebuffServerRpc((int)Debuff.Slow, valuse);
-            }
-            if(UnityEngine.Random.value <= stunChance)
-            {
-                float[] value = { stunDuration };
-                target.GetComponent<Monster>().ApplyDebuffServerRpc((int)Debuff.Sturn, value);
-            }
+                for (int i = 0; i < m_Data.effectType.Length; i++)
+                {
+                    List<float> values = new List<float>(m_Data.effectType[i].parameters);
+                    switch (m_Data.effectType[i].debuffType)
+                    {
+                        case Debuff.Slow:
+
+                            if (UnityEngine.Random.value <= values[0])
+                            {
+                                values.RemoveAt(0);
+                                target.GetComponent<Monster>().ApplyDebuffServerRpc((int)Debuff.Slow, values.ToArray());
+                            }
+                            break;
+
+
+                        case Debuff.Sturn:
+                            if (UnityEngine.Random.value <= values[0])
+                            {
+                                values.RemoveAt(0);
+                                target.GetComponent<Monster>().ApplyDebuffServerRpc((int)Debuff.Sturn, values.ToArray());
+                            }
+                            break;
+                    }
+                }
+            }                        
         }            
     }
 

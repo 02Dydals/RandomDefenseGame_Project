@@ -179,6 +179,7 @@ public class Spawner : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void ServerSpawnHeroServerRpc(ulong clientId, string rarity, string dataName)
     {
+        Debug.Log("½ºÆù");
         HeroSpawn(clientId , rarity, data.name);
     }
 
@@ -294,12 +295,13 @@ public class Spawner : NetworkBehaviour
     private void SetPositionHero(NetworkObject obj, List<Vector2> spawnList, List<bool> spawnArrayList)
     {
         int position_value = spawnArrayList.IndexOf(false);
-
+        Debug.Log(spawnArrayList.Count);
         if(position_value != -1)
         {
             spawnArrayList[position_value] = true;
             obj.transform.position = spawnList[position_value];
-        }                
+        }
+        Debug.Log(position_value);
         Hero_Holder holder = obj.GetComponent<Hero_Holder>();
         holder.index = position_value;
     }

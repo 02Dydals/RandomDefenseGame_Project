@@ -19,3 +19,4 @@ MonoBehaviour:
   rare: 0
   m_animator: {fileID: 9100000, guid: a740e50e543a73c4baaef0e90c71f03f, type: 2}
   HitParticle: {fileID: 7320603770325274999, guid: af9ba4681d97c6a4c8ba4cc8a9703b36, type: 3}
+  effectType: []

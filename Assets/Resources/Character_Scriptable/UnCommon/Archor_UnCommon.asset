@@ -18,4 +18,4 @@ MonoBehaviour:
   Range: 0.7
   rare: 1
   m_animator: {fileID: 9100000, guid: e0e627e62873fab4e89f7725414e9629, type: 2}
-  HitParticle: {fileID: 5515286178823607780, guid: fdefd7047950ad1479124a2a745b2884, type: 3}
+  HitParticle: {fileID: 7320603770325274999, guid: af9ba4681d97c6a4c8ba4cc8a9703b36, type: 3}
