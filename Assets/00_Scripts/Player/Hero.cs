@@ -38,6 +38,10 @@ public class Hero : Character
 
     [SerializeField] private GameObject spawnParticle;
 
+    public float slowChance = 0.5f;
+    public float slowAmount = 0.3f;
+    public float slowDuration = 2.0f;
+
     private int UpgradeCount()
     {
         switch(m_Data.rare)
@@ -147,7 +151,13 @@ public class Hero : Character
     public void SetDamage()
     {
         if (target != null)
+        {
             AttackMonsterServerRpc(target.NetworkObjectId);
+            if(UnityEngine.Random.value <= slowChance)
+            {
+                target.GetComponent<Monster>().ApplySlowServerRpc(slowAmount, slowDuration);
+            }
+        }            
     }
 
     [ServerRpc(RequireOwnership = false)]

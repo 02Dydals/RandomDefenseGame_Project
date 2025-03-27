@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEditor.ShaderGraph.Internal;
 
 
 public class Monster : Character
@@ -10,8 +11,14 @@ public class Monster : Character
     public bool Boss;
 
     [SerializeField] private float m_Speed = 1f;
+    private float originalSpeed;
     [SerializeField] private HitText hitText;
     [SerializeField] private Image m_Fill, m_Fill_Deco;
+
+    Coroutine slowCoroutine;
+    [SerializeField] private Color slowColor;
+    private float currentSlowAmount;
+    private float currentSlowDuration;
 
     int target_Value = 0;
     public double HP = 0, MaxHP = 30;
@@ -25,6 +32,7 @@ public class Monster : Character
     {
         HP = CalculateMonsterHP(Game_Mng.instance.Wave);
         MaxHP = HP;
+        originalSpeed = m_Speed;
         base.Awake();
     }
 
@@ -133,4 +141,49 @@ public class Monster : Character
             this.gameObject.SetActive(false);
         }
     }
+
+    #region 슬로우
+    /*슬로우 프로퍼티
+     * float slowChance; 캐릭터가 몬스터에게 슬로우를 줄 확률
+     * float slowAmount; 몬스터의 속도를 감소시키는 확률
+     * float slowDuration; 슬로우 효과가 유지는 시간
+     * float m_Speed; 몬스터의 속도     
+     */
+
+    [ServerRpc(RequireOwnership = false)]
+    public void ApplySlowServerRpc(float slowAmount, float duration)
+    {
+        if (slowAmount > currentSlowAmount || (slowAmount == currentSlowAmount && duration > currentSlowDuration))
+        {
+            currentSlowAmount = slowAmount;
+            currentSlowDuration = duration;
+
+            ApplySlowClientRpc(slowAmount, duration);
+        }
+    }
+
+    [ClientRpc]
+    private void ApplySlowClientRpc(float slowAmount, float duration)
+    {
+        if (slowCoroutine != null)
+        {
+            StopCoroutine(slowCoroutine);
+        }
+        slowCoroutine = StartCoroutine(SlowEffectCoroutine(slowAmount, duration));
+    }
+
+    private IEnumerator SlowEffectCoroutine(float slowAmount, float duration)
+    {
+        float newSpeed = originalSpeed - (originalSpeed * slowAmount);
+        newSpeed = Mathf.Max(newSpeed, 0.1f);
+        m_Speed = newSpeed;
+        renderer.color = slowColor;
+        yield return new WaitForSeconds(duration);
+        m_Speed = originalSpeed;
+        renderer.color = Color.white;
+    }
+
+
+
+    #endregion 슬로우
 }

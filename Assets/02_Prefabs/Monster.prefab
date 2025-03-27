@@ -526,12 +526,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  Boss: 0
   m_Speed: 1
   hitText: {fileID: 1539927542192898156, guid: 6f629e9978102274e8147307069bd4c5, type: 3}
   m_Fill: {fileID: 1363103388789463934}
   m_Fill_Deco: {fileID: 6943700365240677652}
+  slowColor: {r: 0.02024743, g: 0.1895967, b: 0.3301887, a: 0.8235294}
   HP: 0
-  MaxHP: 30
+  MaxHP: 100
 --- !u!58 &-8127687821333103831
 CircleCollider2D:
   m_ObjectHideFlags: 0
