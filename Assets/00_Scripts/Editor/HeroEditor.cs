@@ -101,7 +101,7 @@ public class HeroEditor : Editor
         EditorGUILayout.PropertyField(serializedObject.FindProperty("rare"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("m_animator"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("HitParticle"));
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("skillData"));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("skillData"));        
 
         EditorGUILayout.Space(20f);
 

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cc3b7da110576f4c997461d92bd7d59, type: 3}
+  m_Name: Cleric
+  m_EditorClassIdentifier: 
+  Name: Cleric
+  ATK: 20
+  ATK_Speed: 1
+  Range: 1
+  rare: 1
+  m_animator: {fileID: 9100000, guid: 3ff0d340dcdaf684b8711dee5e85040a, type: 2}
+  HitParticle: {fileID: 5515286178823607780, guid: fdefd7047950ad1479124a2a745b2884, type: 3}
+  effectType: []
+  skillData:
+    skill: 0
+    Cooltime: 0
+    SkillDamage: 0
+    Particle: {fileID: 0}

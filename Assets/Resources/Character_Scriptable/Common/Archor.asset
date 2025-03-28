@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Archor
   ATK: 7
-  ATK_Speed: 3
+  ATK_Speed: 1
   Range: 1
   rare: 0
   m_animator: {fileID: 9100000, guid: e0e627e62873fab4e89f7725414e9629, type: 2}
@@ -25,3 +25,8 @@ MonoBehaviour:
     - 0.5
     - 0.5
     - 2.5
+  skillData:
+    skill: 0
+    Cooltime: 0
+    SkillDuration: 0
+    Particle: {fileID: 0}

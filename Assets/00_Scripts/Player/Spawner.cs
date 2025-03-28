@@ -159,7 +159,7 @@ public class Spawner : NetworkBehaviour
         Host_Client_Value_Index[value]++;
 
         
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.7f);
         SpawnGridClientRpc(networkObject.NetworkObjectId, Organizers);
     }
 

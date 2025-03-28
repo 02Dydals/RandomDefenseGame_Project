@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cc3b7da110576f4c997461d92bd7d59, type: 3}
+  m_Name: Sword
+  m_EditorClassIdentifier: 
+  Name: Sword
+  ATK: 30
+  ATK_Speed: 1
+  Range: 1
+  rare: 2
+  m_animator: {fileID: 9100000, guid: 08c8896c7db4d374abefae432a5c9664, type: 2}
+  HitParticle: {fileID: -6936711969764373104, guid: f19c2bb5ec65ab84dbdbe7e43bcd9d1d, type: 3}
+  effectType: []
+  skillData:
+    skill: 0
+    Cooltime: 0
+    SkillDuration: 0
+    Particle: {fileID: 0}
