@@ -1,7 +1,20 @@
+using JetBrains.Annotations;
 using NUnit.Framework;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+
+
+
+[System.Serializable]
+public class SkillData
+{
+    public SKILL skill;
+    public float Cooltime;
+    public float SkillDamage;
+    public GameObject Particle;
+}
+
 
 [System.Serializable]
 public class StatusEffect
@@ -55,6 +68,10 @@ public class Hero_Scriptable : ScriptableObject
     [Header("##Hero Debuff Data##")]
     [Space(20f)]
     public StatusEffect[] effectType;
+
+    [Header("##Hero Skill Data##")]
+    [Space(20f)]
+    public SkillData skillData;
 
     public HeroData GetHeroData()
     {
