@@ -31,10 +31,13 @@ public class Game_Mng : NetworkBehaviour
     public int[] Upgrade = new int[4];
     public bool GetBoss = false;
 
+    public float DistanceMagnitude;
+
     public event OnMoneyUpEventHandler OnMoneyUp;
     public event OnTimerUpEventHandler OnTimerUp;
 
     public List<Monster> monsters = new List<Monster>();
+    public List<Hero> heros = new List<Hero>();
     public List<Monster> Boss_Monster = new List<Monster>();
     public int MonsterCount;
     public Boss_Scriptable B_Data;
@@ -70,6 +73,16 @@ public class Game_Mng : NetworkBehaviour
             NotifyGetMoneyClientRpc(value);
         }
         OnMoneyUp?.Invoke();
+    }
+
+    public void AddHero(Hero hero)
+    {
+        heros.Add(hero);
+    }
+
+    public void RemoveHero(Hero hero)
+    {
+        heros.Remove(hero);
     }
 
     public void AddMonster(Monster monster, bool Boss = false)

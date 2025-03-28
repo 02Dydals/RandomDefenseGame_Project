@@ -11,7 +11,7 @@ public class SkillData
 {
     public SKILL skill;
     public float Cooltime;
-    public float SkillDamage;
+    public float SkillDuration;
     public GameObject Particle;
 }
 

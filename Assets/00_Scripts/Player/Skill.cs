@@ -39,6 +39,11 @@ public class Skill : MonoBehaviour
         return Game_Mng.instance.monsters;
     }
 
+    private List<Hero> heros()
+    {
+        return Game_Mng.instance.heros;
+    }
+
     private bool Distance(Vector2 startPos, Vector2 endPos, float checkDistance)
     {
         if(Vector2.Distance(startPos, endPos) <= checkDistance)
@@ -48,9 +53,14 @@ public class Skill : MonoBehaviour
         return false;
     }
 
+    private float DistanceStep(int value)
+    {
+        return (Game_Mng.instance.DistanceMagnitude * value) + 0.1f;
+    }
+
     private double SkillDamage()
     {
-        return hero.ATK * (m_Data.skillData.SkillDamage / 100);
+        return hero.ATK * (m_Data.skillData.SkillDuration / 100);
     }
 
     IEnumerator SkillDelay()
@@ -80,9 +90,8 @@ public class Skill : MonoBehaviour
     {
         switch(m_State)
         {
-            case SKILL.Gun:
-                Gun();
-                break;
+            case SKILL.Gun: Gun(); break;
+            case SKILL.Cleric: Cleric(); break;
         }
     }
 
@@ -100,6 +109,20 @@ public class Skill : MonoBehaviour
                 float[] values = { 2.0f };
                 monster.GetDamage(SkillDamage());
                 monster.ApplyDebuffServerRpc(1, values);
+            }
+        }
+    }
+
+    private void Cleric()
+    {
+        Vector2 pos = transform.position;
+        for(int i=0; i<heros().Count; i++)
+        {
+            var hero = heros()[i];            
+            if(Distance(pos, hero.transform.position, DistanceStep(2)))
+            {
+                Instantiate(m_Data.skillData.Particle, hero.transform.position, Quaternion.identity);
+                hero.SetATKSpeed(m_Data.skillData.SkillDuration / 100, 3.0f);
             }
         }
     }

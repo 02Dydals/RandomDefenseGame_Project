@@ -114,6 +114,8 @@ public class Spawner : NetworkBehaviour
         float xCount = tt.localScale.x / 6;
         float yCount = tt.localScale.y / 3;
 
+        Game_Mng.instance.DistanceMagnitude = Mathf.Max(xCount, yCount);
+
         xValue = xCount;
         yValue = yCount;        
 
@@ -199,6 +201,7 @@ public class Spawner : NetworkBehaviour
         int value = clientId == 0 ? 0 : 1;
         string Organizers = temp + Host_Client_Value_Index[value].ToString();        
 
+        Debug.Log("GetExistingHolder");
         var existingHolder = GetExistingHolder(temp, data.Name);
 
         ClientNavigationClientRpc(clientId, data.Name, data.rare.ToString());

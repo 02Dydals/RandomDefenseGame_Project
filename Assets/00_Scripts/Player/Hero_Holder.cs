@@ -228,6 +228,7 @@ public class Hero_Holder : NetworkBehaviour
 
     void CheckGetPosition()
     {
+        Debug.Log("ChekGetPosition");
         for(int i=0; i<m_Heroes.Count; i++)
         {
             m_Heroes[i].transform.localPosition = Hero_Vector_Pos(m_Heroes.Count)[i];

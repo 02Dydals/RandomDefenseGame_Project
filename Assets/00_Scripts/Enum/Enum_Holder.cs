@@ -2,7 +2,8 @@
 public enum SKILL
 {
     None,
-    Gun
+    Gun,
+    Cleric
 }
 
 public enum Debuff
